@@ -147,6 +147,6 @@ history:
     sources: 2
   - event: extended
     date: 2026-05-01
-    commit: "--"
+    commit: "282065da2c38b266494fdfba5cc19efb1aab3215"
     sources: 8
     notes: Added Simon Willison's Agentic Engineering Patterns, OpenAI harness engineering, Anthropic Agent Skills + Claude Code best practices, Google skills knowledge-gap study, and HumanLayer 12-factor agents
