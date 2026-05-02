@@ -1,0 +1,76 @@
+id: skill-design-patterns
+created: 2026-05-01
+tags:
+  - skill-design
+  - skill-architecture
+  - skill-patterns
+  - orchestration
+  - subagent-dispatch
+  - phase-based-execution
+  - meta-routing
+  - artifact-management
+  - swain
+  - code-review
+  - progressive-disclosure
+  - skill-engineering
+
+default-ttl:
+  repository: 180d
+
+sources:
+  - id: code-review-skill
+    type: repository
+    title: Code Review Skill — Multi-Agent Parallel Review
+    path: ~/Documents/code/code-review-skill
+    fetched: 2026-05-01
+    content-hash: ff8f910fa2b1bab507e8dd636d7db349647f8f6189b1ac780a52af3d605b3be1
+    selective: true
+    highlights:
+      - SKILL.md
+      - agents/security.md
+      - agents/style.md
+      - agents/logic.md
+      - agents/docs.md
+      - agents/memory.md
+      - agents/project-memory-conformance.md
+      - agents/synthesis.md
+      - diff-methods/full-codebase.md
+      - diff-methods/git-ref-diff.md
+      - platforms/github.md
+      - platforms/forgejo.md
+      - platforms/local.md
+      - scripts/generate.sh
+
+  - id: swain-skill-ecosystem
+    type: repository
+    title: Swain Skill Ecosystem — 25+ Composable Agent Skills
+    path: ~/Documents/code/swain
+    fetched: 2026-05-01
+    content-hash: fe82c7a0594656b2c1e0ef4cfe62575cf37e3ce913be99ce848d35eb8141b976
+    selective: true
+    highlights:
+      - swain-skills/swain/SKILL.md
+      - swain-skills/swain-design/SKILL.md
+      - swain-skills/swain-do/SKILL.md
+      - swain-skills/swain-search/SKILL.md
+      - swain-skills/swain-session/SKILL.md
+      - swain-skills/swain-teardown/SKILL.md
+      - swain-skills/swain-sync/SKILL.md
+      - swain-skills/swain-release/SKILL.md
+      - swain-skills/swain-init/SKILL.md
+      - swain-skills/swain-retro/SKILL.md
+      - swain-skills/swain-doctor/SKILL.md
+      - swain-skills/swain-roadmap/SKILL.md
+      - AGENTS.md
+      - SESSION-ROADMAP.md
+      - swain.settings.json
+      - skills-lock.json
+
+refreshed: 2026-05-01
+cross-reference: skills-md-standard
+
+history:
+  - event: created
+    date: 2026-05-01
+    commit: "--"
+    sources: 2

@@ -1,0 +1,36 @@
+{
+  "editor": "auto",
+  "fileBrowser": "auto",
+  "terminal": {
+    "tabNameFormat": "{project} @ {branch}"
+  },
+  "sync": {
+    "scanners": {
+      "gitleaks": { "enabled": true },
+      "trufflehog": { "enabled": false },
+      "trivy": { "enabled": false, "scanners": ["vuln", "license"], "severity": "HIGH,CRITICAL" },
+      "osv-scanner": { "enabled": false }
+    }
+  },
+  "dispatch": {
+    "model": "claude-sonnet-4-6",
+    "maxTurns": 15,
+    "labels": ["agent-dispatch", "swain"],
+    "autoTrigger": true
+  },
+  "stage": {
+    "motd": {
+      "refreshInterval": 5,
+      "spinnerStyle": "braille"
+    },
+    "defaultLayout": "focus"
+  },
+  "prioritization": {
+    "driftThresholds": {
+      "high": 14,
+      "medium": 28
+    },
+    "minActivityThreshold": 5,
+    "attentionWindowDays": 30
+  }
+}

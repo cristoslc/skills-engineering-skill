@@ -1,0 +1,79 @@
+id: skills-md-standard
+created: 2026-05-01
+tags:
+  - agent-skills
+  - skill-md
+  - skills-standard
+  - anthropic
+  - claude-code
+  - progressive-disclosure
+  - skill-authoring
+
+default-ttl:
+  web-page: 90d
+  spec: 180d
+
+sources:
+  - id: agentskills-spec
+    url: https://agentskills.io/specification
+    type: web-page
+    title: Agent Skills Specification
+    fetched: 2026-05-01
+    content-hash: 0c68ca2795a8156bd8c02990b969c1136710e2acf214cf3d135fd1c6107a1fb0
+    notes: The canonical specification. Most stable source.
+
+  - id: anthropic-skills-overview
+    url: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+    type: web-page
+    title: Agent Skills — Claude API Docs Overview
+    fetched: 2026-05-01
+    content-hash: f4d4827e8f1437cd658f640dc4bfa70bf5ee0ae7adf83e1c161a191f42159345
+    notes: Covers the three-level loading model and product surface constraints.
+
+  - id: anthropic-skills-blog
+    url: https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
+    type: web-page
+    title: Equipping agents for the real world with Agent Skills
+    fetched: 2026-05-01
+    content-hash: fb7e990d77de934d78123a11d6763e09c1d3360344f10cc9e214b08d06436139
+    notes: Design philosophy and progressive disclosure explanation. Updated Dec 2025 with open standard announcement.
+
+  - id: claude-skills-best-practices
+    url: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+    type: web-page
+    title: Skill authoring best practices — Claude API Docs
+    fetched: 2026-05-01
+    content-hash: 9d0a2b8859c0e375f79798edab84257bd952052b898312168bb0164e7a83181d
+    notes: Authoring patterns, anti-patterns, eval-driven development workflow.
+
+  - id: claude-code-skills
+    url: https://code.claude.com/docs/en/skills
+    type: web-page
+    title: Extend Claude with skills — Claude Code Docs
+    fetched: 2026-05-01
+    content-hash: 80a45a9d6f2f7f628b16d5e8c6d33aba5b7cee62958352bb64a223eb76534561
+    notes: Claude Code-specific frontmatter (context, agent, hooks, paths, shell, etc.) and lifecycle behavior.
+
+  - id: skill-creator-plugin
+    url: https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md
+    type: web-page
+    title: Anthropic's official skill-creator SKILL.md
+    fetched: 2026-05-01
+    content-hash: b848404cd54d853a28523cb653c51e3996c6888ca06a1729632cda4c732c36d7
+    notes: The full skill-creator SKILL.md from the anthropics/skills repo. Contains the eval-driven workflow (Create/Eval/Improve/Benchmark), test case format, subagent spawning, description optimization loop, and environment-specific instructions.
+
+  - id: skill-creator-plugin-page
+    url: https://claude.com/plugins/skill-creator
+    type: web-page
+    title: Skill Creator Plugin page on claude.com
+    fetched: 2026-05-01
+    content-hash: e76c5e41706f2bb1e9fba23721806d63991d2b33221a830d02c41e380bae33d7
+    notes: The marketing/plugin listing page. Confirms Anthropic Verified status, install count (~176k), four composable agents (Executor, Grader, Comparator, Analyzer), and related official plugins.
+
+refreshed: 2026-05-01
+
+history:
+  - event: created
+    date: 2026-05-01
+    commit: "--"
+    sources: 7

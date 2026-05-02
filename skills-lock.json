@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "swain-search": {
+      "source": "cristoslc/swain",
+      "sourceType": "github",
+      "skillPath": "skills/swain-search/SKILL.md",
+      "computedHash": "2bc6ca65f68edc033c16d8e2e4246e6c5452574cc1d8dcc7d7d307f2f0285b53"
+    }
+  }
+}
