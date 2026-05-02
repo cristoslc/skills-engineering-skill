@@ -13,6 +13,13 @@ tags:
   - code-review
   - progressive-disclosure
   - skill-engineering
+  - harness-engineering
+  - context-engineering
+  - code-economics
+  - tdd
+  - production-agents
+  - architecture-enforcement
+  - repository-design
 
 default-ttl:
   repository: 180d
@@ -66,6 +73,70 @@ sources:
       - swain.settings.json
       - skills-lock.json
 
+  - id: simonw-agentic-engineering-patterns
+    type: web
+    title: Agentic Engineering Patterns — Simon Willison
+    url: https://simonwillison.net/2026/Feb/23/agentic-engineering-patterns/
+    author: Simon Willison
+    fetched: 2026-05-01
+    content-hash: 3c3c8738ca61b3c3973af7326c04ba926d030a2c6ae673b6e09ced50daf7013c
+
+  - id: simonw-red-green-tdd
+    type: web
+    title: Red/green TDD — Agentic Engineering Patterns
+    url: https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/
+    author: Simon Willison
+    fetched: 2026-05-01
+    content-hash: 7b8f97059969ece5ac96ae2db1aeb743c30cb404c28b0805ced3e278422cc053
+
+  - id: simonw-code-is-cheap
+    type: web
+    title: Writing Code Is Cheap Now — Agentic Engineering Patterns
+    url: https://simonwillison.net/guides/agentic-engineering-patterns/code-is-cheap/
+    author: Simon Willison
+    fetched: 2026-05-01
+    content-hash: 417890384614f259486efdf42b4d774c36af1c84233a734fd8fbdaed87cbbef2
+
+  - id: openai-harness-engineering
+    type: web
+    title: Harness Engineering — Leveraging Codex in an Agent-First World (OpenAI Engineering)
+    url: https://openai.com/index/harness-engineering/
+    author: Ryan Lopopolo (OpenAI)
+    fetched: 2026-05-01
+    content-hash: 4bc5273022a719babe15429b0aba18bdac3a70b2074a3d9c8bcffdd81644a372
+
+  - id: anthropic-agent-skills
+    type: web
+    title: Equipping Agents for the Real World with Agent Skills (Anthropic Engineering)
+    url: https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
+    author: Barry Zhang, Keith Lazuka, Mahesh Murag (Anthropic)
+    fetched: 2026-05-01
+    content-hash: 6d66039c33237aa203577912577af76e73c1267ed12fe04033435d011ca5c89d
+
+  - id: anthropic-claude-code-best-practices
+    type: web
+    title: Best Practices for Claude Code (Anthropic Engineering)
+    url: https://www.anthropic.com/engineering/claude-code-best-practices
+    author: Anthropic
+    fetched: 2026-05-01
+    content-hash: 4e3ee142a480353aac39b99a20e2f1ad67af95ac34373103e1150d1064b6a56b
+
+  - id: google-agent-skills-knowledge-gap
+    type: web
+    title: Closing the Knowledge Gap with Agent Skills (Google Developers Blog)
+    url: https://developers.googleblog.com/closing-the-knowledge-gap-with-agent-skills/
+    author: Philipp Schmid, Mark McDonald (Google DeepMind)
+    fetched: 2026-05-01
+    content-hash: ed4c6d0d50544412740bbb0ec8928fe9a16d5d9538020f7c78c4768834539b8b
+
+  - id: humanlayer-12-factor-agents
+    type: web
+    title: 12-Factor Agents — Principles for Reliable LLM Applications
+    url: https://github.com/humanlayer/12-factor-agents
+    author: Dex Horthy (HumanLayer)
+    fetched: 2026-05-01
+    content-hash: 1e0c06fc99d11234f4926faf60a5fddcd983c54c59caaab549e1d034a37060f4
+
 refreshed: 2026-05-01
 cross-reference: skills-md-standard
 
@@ -74,3 +145,8 @@ history:
     date: 2026-05-01
     commit: "d2a6b0438e35812e4719d8370734397723486a1a"
     sources: 2
+  - event: extended
+    date: 2026-05-01
+    commit: "--"
+    sources: 8
+    notes: Added Simon Willison's Agentic Engineering Patterns, OpenAI harness engineering, Anthropic Agent Skills + Claude Code best practices, Google skills knowledge-gap study, and HumanLayer 12-factor agents
