@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # test-generate.sh — Acceptance tests for skills-engineering generate.sh (v0.2 — 9 phases)
 #
-# Usage: bash skills-engineering/tests/test-generate.sh
+# Usage: bash skills/skills-engineering/tests/test-generate.sh
 
 set +e
 

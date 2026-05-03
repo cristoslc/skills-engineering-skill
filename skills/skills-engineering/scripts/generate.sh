@@ -26,7 +26,7 @@ fi
 
 SKILL_NAME="$(basename "$SKILL_PATH")"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-SKILLS_ENG_ROOT="$REPO_ROOT/skills-engineering"
+SKILLS_ENG_ROOT="$REPO_ROOT/skills/skills-engineering"
 
 # ---- tier detection ----
 
