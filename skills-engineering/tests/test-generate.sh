@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # test-generate.sh — Acceptance tests for skills-engineering generate.sh (v0.2 — 9 phases)
 #
-# Usage: bash skills/skills-engineering/tests/test-generate.sh
+# Usage: bash skills-engineering/tests/test-generate.sh
 
 set +e
 
@@ -366,7 +366,7 @@ fi
 
 echo ""
 echo "--- AC24: eval phase (behavioral tier) skips adversarial, runs behavioral ---"
-output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake 2>&1)
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope behavioral 2>&1)
 if echo "$output" | grep -q "Run agent behavioral tests"; then
   pass "AC24: agent behavioral step present in behavioral tier"
 else

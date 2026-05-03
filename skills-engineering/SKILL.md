@@ -32,7 +32,7 @@ Do not reference this file for phase instructions. Call `scripts/generate.sh` â€
 ## How to invoke
 
 ```bash
-bash skills/skills-engineering/scripts/generate.sh \
+bash skills-engineering/scripts/generate.sh \
   --phase <spec|behavioral|script-test|script|skill|adversary|eval|improve|refactor> \
   --skill-path .agents/skills/<skill-name>
 ```
