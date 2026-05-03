@@ -1,0 +1,63 @@
+{
+  "skill_name": "skills-engineering",
+  "tests": [
+    {
+      "id": "smk-001",
+      "name": "skill-metadata-is-valid",
+      "given": "The skills-engineering skill is loaded",
+      "when": "An agent checks the skill's structure",
+      "then": {
+        "agent_behavior": [
+          "Skill has valid YAML frontmatter with name: skills-engineering",
+          "Skill has a non-empty description field",
+          "SKILL.md body is under 500 lines",
+          "SKILL.md describes the 9-phase TDD lifecycle",
+          "generate.sh exists and is executable"
+        ]
+      }
+    },
+    {
+      "id": "smk-002",
+      "name": "all-nine-phases-accessible",
+      "given": "generate.sh is called with each of the 9 phases",
+      "when": "Each phase flag is passed",
+      "then": {
+        "agent_behavior": [
+          "spec phase exits 0 and references spec.md",
+          "behavioral phase exits 0 and references BDD contract format",
+          "script-test phase exits 0 and includes test template",
+          "script phase exits 0 and enforces AC-by-AC discipline",
+          "skill phase exits 0 and prohibits eval references",
+          "adversary phase exits 0 and instructs studying the target",
+          "eval phase exits 0 and runs script tests first",
+          "improve phase exits 0 and references .eval-results.json",
+          "refactor phase exits 0 and prohibits behavior changes"
+        ]
+      }
+    },
+    {
+      "id": "smk-003",
+      "name": "invalid-phase-rejected",
+      "given": "generate.sh is called with --phase invalid",
+      "when": "The invalid flag is passed",
+      "then": {
+        "agent_behavior": [
+          "Script exits with non-zero status",
+          "Script lists all 9 valid phases in the error message"
+        ]
+      }
+    },
+    {
+      "id": "smk-004",
+      "name": "script-acceptance-tests-pass",
+      "given": "The skills-engineering scripts are fully implemented",
+      "when": "Script acceptance tests are run",
+      "then": {
+        "agent_behavior": [
+          "test-generate.sh exits with status 0",
+          "test-generate.sh reports zero failures"
+        ]
+      }
+    }
+  ]
+}

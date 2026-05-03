@@ -1,0 +1,150 @@
+{
+  "skill_name": "skills-engineering",
+  "tests": [
+    {
+      "id": "beh-001",
+      "name": "routes-spec-to-behavioral",
+      "given": "A user asks: 'I want to create a skill for reviewing pull requests'",
+      "when": "The skills-engineering skill activates",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase spec with the target skill path",
+          "Emits instructions to declare intent and boundaries in spec.md",
+          "Does NOT emit behavioral test content in the spec phase",
+          "Next phase pointer is behavioral"
+        ]
+      }
+    },
+    {
+      "id": "beh-002",
+      "name": "routes-behavioral-to-script-test",
+      "given": "A user has written spec.md and asks: 'Define the behavioral tests'",
+      "when": "The skills-engineering skill activates for the behavioral phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase behavioral with the target skill path",
+          "Emits BDD contract format with given/when/then",
+          "Instructs writing behavioral-tests.json with script invocation clauses",
+          "Next phase pointer is script-test"
+        ]
+      }
+    },
+    {
+      "id": "beh-003",
+      "name": "routes-script-test-to-script",
+      "given": "A user has written behavioral tests and asks: 'Now write tests for my generate.sh script'",
+      "when": "The skills-engineering skill activates for the script-test phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase script-test with the target skill path",
+          "Emits bash test template with AC-by-AC structure",
+          "Emits coverage expectations by script complexity",
+          "Instructs confirming red state (script doesn't exist yet)",
+          "Next phase pointer is script"
+        ]
+      }
+    },
+    {
+      "id": "beh-004",
+      "name": "routes-script-to-skill",
+      "given": "Script acceptance tests exist and are red. User says: 'Write the scripts'",
+      "when": "The skills-engineering skill activates for the script phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase script with the target skill path",
+          "Emits AC-by-AC discipline: failing AC → minimal code → retest → green",
+          "Instructs not writing the entire script at once",
+          "After all ACs pass, instructs running all test files to confirm",
+          "Next phase pointer is skill"
+        ]
+      }
+    },
+    {
+      "id": "beh-005",
+      "name": "routes-skill-to-adversary",
+      "given": "Scripts pass their tests. User says: 'Now write the SKILL.md'",
+      "when": "The skills-engineering skill activates for the skill phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase skill with the target skill path",
+          "Emits instruction to read behavioral-tests.json as contracts",
+          "Emits do-not-read-eval-references prohibition",
+          "Emits authoring guide reference",
+          "Next phase pointer is adversary"
+        ]
+      }
+    },
+    {
+      "id": "beh-006",
+      "name": "routes-adversary-to-eval",
+      "given": "SKILL.md exists. User says: 'Write adversarial tests to try to break this skill'",
+      "when": "The skills-engineering skill activates for the adversary phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase adversary with the target skill path",
+          "Emits instruction to study the target (read SKILL.md and spec.md)",
+          "Emits adversarial test format with must_not and must clauses",
+          "Lists attack vectors: file writes outside boundary, cross-skill invocation, scope creep, boundary edge cases",
+          "Next phase pointer is eval"
+        ]
+      }
+    },
+    {
+      "id": "beh-007",
+      "name": "eval-runs-script-tests-first",
+      "given": "All tests and skill are defined. User says: 'Run the full evaluation'",
+      "when": "The skills-engineering skill activates for the eval phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase eval with the target skill path",
+          "Emits script acceptance tests as deterministic first step",
+          "Emits gate: do not proceed to agent tests if script tests fail",
+          "Emits specialist topology subagent dispatch for agent behavioral tests",
+          "Respects the tier: smoke only runs smoke-tests.json, behavioral skips adversarial, full runs everything"
+        ]
+      }
+    },
+    {
+      "id": "beh-008",
+      "name": "improve-phase-returns-to-eval",
+      "given": "Eval results show failures. User says: 'Fix the failing tests'",
+      "when": "The skills-engineering skill activates for the improve phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase improve with the target skill path",
+          "Emits instruction to read .eval-results.json",
+          "Emits generalization principle (don't overfit)",
+          "Advises returning to the specific phase that owns the failure (script/skill)",
+          "Next phase pointer is eval (loop)"
+        ]
+      }
+    },
+    {
+      "id": "beh-009",
+      "name": "refactor-does-not-change-behavior",
+      "given": "All eval tests pass. User says: 'Clean up the skill structure'",
+      "when": "The skills-engineering skill activates for the refactor phase",
+      "then": {
+        "agent_behavior": [
+          "Calls generate.sh --phase refactor with the target skill path",
+          "Emits do-not-change-behavior rule",
+          "Emits re-run-eval-after-every-change instruction",
+          "Lists what to look for: DRY, bloated scripts, unclear naming, missing references",
+          "Notes that adding features requires a new spec→behavioral→... cycle"
+        ]
+      }
+    },
+    {
+      "id": "beh-010",
+      "name": "script-tests-pass",
+      "given": "The skills-engineering scripts are fully implemented",
+      "when": "Script acceptance tests are run",
+      "then": {
+        "agent_behavior": [
+          "test-generate.sh exits with status 0",
+          "test-generate.sh reports zero failures"
+        ]
+      }
+    }
+  ]
+}
