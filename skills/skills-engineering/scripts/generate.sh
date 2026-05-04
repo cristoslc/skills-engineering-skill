@@ -147,6 +147,7 @@ Load $SKILL_PATH/spec.md. Every behavioral test must respect the declared bounda
 ### Step 2: Write behavioral-tests.json
 
 Read $SKILLS_ENG_ROOT/references/spec/phase.md for the full format guide.
+Use the template at $SKILLS_ENG_ROOT/assets/behavioral-tests.json.j2 as the shape contract — fill in the \`{% for %}\` loops and \`{{ }}\` slots with your test cases.
 Write $SKILL_PATH/tests/behavioral-tests.json:
 
 \`\`\`json
@@ -395,6 +396,7 @@ Read $SKILL_PATH/SKILL.md and $SKILL_PATH/spec.md. Identify:
 
 ### Step 2: Write adversarial-tests.json
 
+Use the template at $SKILLS_ENG_ROOT/assets/adversarial-tests.json.j2 as the shape contract — fill in the \`{% for %}\` loops and \`{{ }}\` slots with your attack cases.
 Write $SKILL_PATH/tests/adversarial-tests.json:
 
 \`\`\`json

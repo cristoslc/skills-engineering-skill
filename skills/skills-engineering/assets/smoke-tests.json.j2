@@ -1,0 +1,32 @@
+{# smoke-tests.json.j2 — Template for fast smoke test contracts
+   Fields:
+     skill_name: basename of the skill directory
+     tests[]: array of smoke test contracts (structural/trivial-change validation)
+       id: unique test ID, prefix "smk-" plus zero-padded sequence number
+       name: short hyphenated label describing the validation
+       given: preconditions (skill is loaded, script is called, etc.)
+       when:  the validation trigger
+       then.agent_behavior[]: ordered list of expected assertions
+#}
+{
+  "skill_name": "{{ skill_name }}",
+  "tests": [
+{% for test in tests %}
+    {
+      "id": "{{ test.id }}",
+      "name": "{{ test.name }}",
+      "given": "{{ test.given }}",
+      "when": "{{ test.when }}",
+      "then": {
+        "agent_behavior": [
+{% for behavior in test.then.agent_behavior %}
+          "{{ behavior }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ]
+      }
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  ]
+}

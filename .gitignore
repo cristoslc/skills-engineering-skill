@@ -1,0 +1,7 @@
+# macOS
+.DS_Store
+
+# Tool config directories (regenerate locally)
+.claude/
+.crush/
+.goose/

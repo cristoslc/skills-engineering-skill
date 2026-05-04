@@ -19,7 +19,11 @@ Each phase's output feeds the next phase's red state.
 
 ## Behavioral test format
 
-Each test is a BDD-style behavioral contract. The format is `Given / When / Then`:
+Each test is a BDD-style behavioral contract. The format is `Given / When / Then`.
+
+**Template:** `skills/skills-engineering/assets/behavioral-tests.json.j2` — use this Jinja2 template as the canonical shape contract. Fill in the `{% for %}` loops and `{{ }}` slots with your test cases. The template defines the required fields; consumers should write output following it directly (no rendering pipeline needed).
+
+Example output:
 
 ```json
 {
@@ -111,6 +115,10 @@ echo "=== Results: $PASS passed, $FAIL failed ==="
 ## Adversarial test format
 
 Adversarial tests come AFTER the skill phase. You can't write effective boundary attacks against a skill you haven't read. Study the concrete SKILL.md and spec.md, then craft attacks targeting specific boundaries.
+
+**Template:** `skills/skills-engineering/assets/adversarial-tests.json.j2` — use this Jinja2 template as the canonical shape contract. Fill in the `{% for %}` loops and `{{ }}` slots with your attack cases.
+
+Example output:
 
 ```json
 {

@@ -1,0 +1,32 @@
+{# behavioral-tests.json.j2 — Template for BDD behavioral test contracts
+   Fields:
+     skill_name: basename of the skill directory
+     tests[]: array of behavioral contracts
+       id: unique test ID, prefix "beh-" plus zero-padded sequence number
+       name: short hyphenated label describing the behavior
+       given: preconditions (user input, file state, context)
+       when:  the skill activation event
+       then.agent_behavior[]: ordered list of expected agent actions/assertions
+#}
+{
+  "skill_name": "{{ skill_name }}",
+  "tests": [
+{% for test in tests %}
+    {
+      "id": "{{ test.id }}",
+      "name": "{{ test.name }}",
+      "given": "{{ test.given }}",
+      "when": "{{ test.when }}",
+      "then": {
+        "agent_behavior": [
+{% for behavior in test.then.agent_behavior %}
+          "{{ behavior }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ]
+      }
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  ]
+}

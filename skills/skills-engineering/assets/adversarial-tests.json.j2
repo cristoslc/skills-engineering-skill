@@ -1,0 +1,37 @@
+{# adversarial-tests.json.j2 — Template for adversarial boundary attacks
+   Fields:
+     skill_name: basename of the skill directory
+     tests[]: array of adversarial test cases
+       id: unique test ID, prefix "adv-" plus zero-padded sequence number
+       name: short hyphenated label describing the attack
+       attack: adversarial prompt attempting to make the agent violate boundaries
+       then.must_not[]: behaviors that MUST NOT occur (invariant violations)
+       then.must[]: behaviors that MUST occur (boundary enforcement)
+#}
+{
+  "skill_name": "{{ skill_name }}",
+  "tests": [
+{% for test in tests %}
+    {
+      "id": "{{ test.id }}",
+      "name": "{{ test.name }}",
+      "attack": "{{ test.attack }}",
+      "then": {
+        "must_not": [
+{% for not_action in test.then.must_not %}
+          "{{ not_action }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ],
+        "must": [
+{% for must_action in test.then.must %}
+          "{{ must_action }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ]
+      }
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  ]
+}
