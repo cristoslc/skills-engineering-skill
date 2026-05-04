@@ -1,6 +1,6 @@
 # skills-engineering-skill
 
-A skill (and supporting research) for **engineering Agent Skills** using a rigorous TDD lifecycle. Built on the [SKILL.md protocol](https://github.com/anthropics/claude-code) so the resulting skills can be loaded by Claude Code, the Anthropic Agent SDK, or any compatible harness.
+A skill (and supporting research) for **engineering Agent Skills** using a rigorous TDD lifecycle. Built on the SKILL.md protocol so the resulting skills can be loaded by any compatible agent harness.
 
 ## What's in this repo
 
@@ -38,7 +38,7 @@ bash skills/skills-engineering/scripts/generate.sh \
   --skill-path .agents/skills/<skill-name>
 ```
 
-In Claude Code, invoke via the Skill tool: `/skills-engineering` (or let the harness auto-trigger from the description).
+Invoke via the Skill tool: `/skills-engineering` (or let the harness auto-trigger from the description). Works with Claude Code, opencode, or any compatible harness.
 
 ### Key design principles
 
