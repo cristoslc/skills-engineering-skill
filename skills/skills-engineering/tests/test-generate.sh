@@ -677,6 +677,61 @@ else
   pass "AC45: repeat-N section omitted without --repeat"
 fi
 
+# ---- Failure-path tests (mandatory per test suite standards) ----
+
+echo ""
+echo "--- AC46: --repeat 0 is rejected or normalized ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat 0 --diff-scope full 2>&1)
+status=$?
+if echo "$output" | grep -q 'Repeat mode active'; then
+  fail "AC46: --repeat 0" "should not show repeat section for 0"
+else
+  pass "AC46: --repeat 0 does not show repeat-N section"
+fi
+
+echo ""
+echo "--- AC47: --repeat with non-numeric value is rejected ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat abc --diff-scope full 2>&1)
+status=$?
+if [[ $status -ne 0 ]]; then
+  pass "AC47: --repeat abc exits non-zero"
+else
+  fail "AC47: --repeat abc" "expected non-zero exit, got $status"
+fi
+
+echo ""
+echo "--- AC48: --repeat negative is rejected ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat -1 --diff-scope full 2>&1)
+status=$?
+if [[ $status -ne 0 ]]; then
+  pass "AC48: --repeat -1 exits non-zero"
+else
+  fail "AC48: --repeat -1" "expected non-zero exit, got $status"
+fi
+
+echo ""
+echo "--- AC49: assert_sh failure instruction present in eval phase ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'skip.*grader\|skip.*LLM\|skip.*subagent'; then
+  pass "AC49: eval phase instructs skipping LLM grader on assert_sh failure"
+else
+  fail "AC49: assert_sh failure skip" "no instruction to skip grader on assertion failure"
+fi
+
+echo ""
+echo "--- AC50: suite-meta.json graduation instruction present in eval phase ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'suite-meta.json'; then
+  pass "AC50: suite-meta.json referenced in eval phase"
+else
+  fail "AC50: suite-meta.json" "not found in eval output"
+fi
+if echo "$output" | grep -q 'consecutive_full_passes\|graduated_at\|regression'; then
+  pass "AC50: graduation logic referenced in eval phase"
+else
+  fail "AC50: graduation logic" "not found in eval output"
+fi
+
 # ---- Summary ----
 
 echo ""

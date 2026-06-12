@@ -27,6 +27,17 @@ if [[ -z "$SKILL_PATH" ]]; then
   exit 1
 fi
 
+if [[ -n "$REPEAT" ]]; then
+  if ! [[ "$REPEAT" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: --repeat must be a positive integer, got: $REPEAT" >&2
+    exit 1
+  fi
+  if [[ "$REPEAT" -le 0 ]]; then
+    echo "ERROR: --repeat must be >= 1, got: $REPEAT" >&2
+    exit 1
+  fi
+fi
+
 SKILL_NAME="$(basename "$SKILL_PATH")"
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 SKILLS_ENG_ROOT="$REPO_ROOT/skills/skills-engineering"
