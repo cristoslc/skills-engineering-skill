@@ -59,7 +59,7 @@ sources:
   history:
   - event: created
     date: 2026-06-12
-    commit: "--"
+    commit: "46ed7da"
     sources: 6
 
   - id: arize-phoenix
