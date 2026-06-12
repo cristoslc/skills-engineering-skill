@@ -1,4 +1,4 @@
-# Hardening Skills Eval with Agent Testing Best Practices
+# Enhancing Skills Eval with Agent Testing Best Practices
 
 The current skills-engineering eval phase is a good foundation — specialist-topology subagent grading,
 Track A/B comparison — but compared to what promptfoo, Anthropic, LangSmith, and Arize do, we're
@@ -103,6 +103,79 @@ Add a calibration step: periodically run a small set of tasks with known answers
 solutions), check if the grader's scores match the known labels. If deviation exceeds a
 threshold, flag the grader for recalibration.
 
+## 8. Concrete build-out: translating trove knowledge into skill eval features
+
+The agent-testing-frameworks trove catalogs what the ecosystem does. Here is a concrete
+sequence of features to build into the skills-engineering skill, prioritized by impact:
+
+### Phase A: Code-based pre-grading (least effort, highest leverage)
+
+Before dispatching each trial to a grader subagent, run a shell-level assertion pass.
+The test JSON already has an `assert` key — but today it's passed to the grader subagent
+as part of the grading prompt. Instead, evaluate it locally first:
+
+```
+trial output → shell assertions (code-based) → if all pass → LLM grader for semantic quality
+                                       → if any fail → report failure, skip LLM grader
+```
+
+This would:
+- Catch format violations, boundary leaks, and missing files in milliseconds
+- Reduce grader subagent calls by ~40% on failing tests
+- Provide deterministic evidence that doesn't vary by model choice
+- Align with promptfoo's assertion-first design and Anthropic's code-based grader tier
+
+### Phase B: Repeat-N with pass@k / pass^k
+
+Add a `--repeat N` flag to `generate.sh --phase eval`. When set:
+1. The eval harness runs each test N times (independent trials, clean context each time)
+2. Aggregation computes both metrics:
+   - pass@k: at least 1 of N passes (lenient — for capability evals)
+   - pass^k: all N pass (strict — for regression evals)
+3. The improve phase receives both scores and prioritizes fixing failures that
+   fail consistently (low pass^k) over flaky failures (high pass@k, low pass^k)
+
+Anthropic's key insight: pass@k and pass^k diverge as N grows. A skill that passes
+90% of trials individually might only pass 53% of 5-trial batches consistently.
+That 53% number is what users will experience.
+
+### Phase C: Task quality gates in spec phase
+
+Add automated checks when the spec phase writes test cases:
+- Positive/negative balance checker: at least 30% of tests should test what the
+  skill should NOT do (mirrors Anthropic's "balanced problem sets" rule)
+- Reference solution validator: each test must have a known-good solution that
+  the grader can reference
+- Task ambiguity detector: if two subagent graders disagree on a test's pass/fail
+  verdict, flag the task as ambiguous (Anthropic: "a good task is one where two
+  domain experts would independently reach the same verdict")
+
+### Phase D: Capability-to-regression automatic pipeline
+
+After eval, if all tests pass at pass^k=1.0 across `--repeat 3`, automatically:
+1. Tag the current suite as regression
+2. Generate a new capability suite from harder adversarial tests or user-contributed
+   failures
+3. Add the regression suite to a run-every-commit config
+
+This implements Anthropic's "graduate to regression" pattern and ensures the skill
+keeps getting challenged rather than saturating.
+
+### Phase E: Trace export for consumer integration
+
+After each eval run, emit `.eval-traces/trial-<id>.jsonl` containing:
+- Full transcript (agent output, tool calls, intermediate reasoning)
+- Grading decisions per clause with evidence
+- Timing and cost data
+
+Consumer projects can then:
+- Import traces into Arize Phoenix for production monitoring
+- Feed them into promptfoo for CI/CD integration
+- Use them as LangSmith datasets for regression testing
+
+This is the bridge between offline skill evals and the consumer's production observability
+stack — and it's the piece that makes the eval loop self-sustaining over time.
+
 ## Summary
 
 | Capability | Current | V2 target |
@@ -117,4 +190,6 @@ threshold, flag the grader for recalibration.
 
 None of this requires a new tool — promptfoo, LangSmith, and Arize already implement pieces of
 this. The question is which pieces to embed in the skills-engineering workflow vs. which to
-leave to the consumer project's choice of tool.
+leave to the consumer project's choice of tool. The phasing above favors embedding code-based
+grading and repeat-N (high leverage, low friction) while deferring production trace integration
+to Phase E (requires consumer-side infra).
