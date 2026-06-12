@@ -4,12 +4,14 @@ set -euo pipefail
 PHASE=""
 SKILL_PATH=""
 DIFF_SCOPE=""
+REPEAT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --phase)       PHASE="$2"; shift 2 ;;
     --skill-path)  SKILL_PATH="$2"; shift 2 ;;
     --diff-scope)  DIFF_SCOPE="$2"; shift 2 ;;
+    --repeat)      REPEAT="$2"; shift 2 ;;
     *) shift ;;
   esac
 done
@@ -468,6 +470,22 @@ for t in $SKILL_PATH/tests/test-*.sh; do
   bash "\$t" || { echo "FAILED: \$t — eval aborted"; exit 1; }
 done
 \`\`\`
+
+### Step 2.5: Run shell assertions (code-based pre-grading)
+
+Before dispatching each test to a grader subagent, check if the test has \`assert_sh\`
+clauses. If present, run them as local shell commands against the agent's output and
+filesystem state.
+
+For each test case with \`assert_sh\`:
+1. Run each assertion command. Exit code 0 = pass, non-zero = fail.
+2. If any assertion fails → mark the test as **failed (code-based)**, skip the LLM grader.
+3. If all assertions pass → proceed to the LLM grader for semantic quality grading.
+4. If no \`assert_sh\` field exists → proceed directly to LLM grading.
+
+This catches format violations, boundary leaks, and missing files in milliseconds
+without paying for a subagent call. See $SKILLS_ENG_ROOT/references/eval/phase.md
+for the full assertion format and grading workflow.
 PROMPT
 
   case "$TIER" in
@@ -539,6 +557,11 @@ FULL_EVAL
   cat <<END_EVAL
 ### Step 5: Grade on two tracks
 
+**Track 0 — Code-based assertions (if assert_sh present):**
+For each test with \`assert_sh\` clauses, run shell assertions first.
+If any assertion fails, the test fails (code-based) — skip LLM grading.
+If all assertions pass, proceed to Track A.
+
 **Track A — Behavioral pass/fail:**
 For behavioral tests: does the agent exhibit each \`then.agent_behavior\` clause?
 For adversarial tests (if run): check \`must_not\` and \`must\`.
@@ -546,8 +569,31 @@ Record \`passed\` or \`failed\` with specific evidence.
 
 **Track B — Qualitative comparison:**
 If a baseline or prior version exists, run blind A/B comparison.
+END_EVAL
 
-### Step 6: Aggregate
+  if [[ -n "$REPEAT" && "$REPEAT" -gt 1 ]]; then
+    cat <<REPEAT_SECTION
+
+### Step 5.5: Repeat-N statistical evaluation
+
+**Repeat mode active:** N=$REPEAT trials per test.
+
+For each test, run N independent trials with clean context each time.
+After all trials complete, compute:
+- **pass@k**: the test passes in *at least one* of N trials (lenient — capability eval)
+- **pass^k**: the test passes in *all* N trials (strict — regression eval)
+
+Report both metrics. A test that passes 2/3 times:
+- pass@k = true (at least one pass)
+- pass^k = false (not all pass)
+
+During the improve phase, prioritize fixing tests with low pass^k
+(consistent failures) over tests with high pass@k but low pass^k (flaky failures).
+
+REPEAT_SECTION
+  fi
+
+  cat <<END_EVAL2
 
 Save to $SKILL_PATH/.eval-results.json:
 
@@ -556,9 +602,14 @@ Save to $SKILL_PATH/.eval-results.json:
   "skill_name": "$SKILL_NAME",
   "tier": "$TIER",
   "timestamp": "ISO-8601",
+  "repeat": ${REPEAT:-1},
   "script_tests": {
     "passed": 1, "failed": 0, "total": 1,
     "files": {"test-foo.sh": {"passed": 25, "failed": 0}}
+  },
+  "code_based": {
+    "results": [],
+    "summary": {"passed": 0, "failed": 0, "total": 0}
   },
   "agent_tests": {
     "results": [],
@@ -579,7 +630,7 @@ If any tests failed: run:
 \`\`\`
 bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase improve --skill-path $SKILL_PATH
 \`\`\`
-END_EVAL
+END_EVAL2
 }
 
 # ---- phase 8: improve (iterate from feedback) ----

@@ -7,7 +7,12 @@
        attack: adversarial prompt attempting to make the agent violate boundaries
        then.must_not[]: behaviors that MUST NOT occur (invariant violations)
        then.must[]: behaviors that MUST occur (boundary enforcement)
-#}
+       then.assert_sh[]: optional list of shell assertions to run before LLM grading
+         Typically checks that forbidden files were not modified:
+           "! git diff --name-only | grep -q 'AGENTS.md'"
+         Or that expected boundaries were respected:
+           "test -f path/to/expected/output"
+ #}
 {
   "skill_name": "{{ skill_name }}",
   "tests": [
@@ -28,7 +33,13 @@
           "{{ must_action }}"{% if not loop.last %},{% endif %}
 
 {% endfor %}
-        ]
+        ]{% if test.then.assert_sh is defined and test.then.assert_sh %},
+        "assert_sh": [
+{% for assertion in test.then.assert_sh %}
+          "{{ assertion }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ]{% endif %}
       }
     }{% if not loop.last %},{% endif %}
 

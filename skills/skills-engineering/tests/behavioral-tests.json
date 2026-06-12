@@ -71,6 +71,9 @@
           "Emits do-not-read-eval-references prohibition",
           "Emits authoring guide reference",
           "Next phase pointer is adversary"
+        ],
+        "assert_sh": [
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase skill --skill-path /tmp/assert-test 2>&1 | grep -q 'Do NOT read.*eval'"
         ]
       }
     },
@@ -101,6 +104,10 @@
           "Emits gate: do not proceed to agent tests if script tests fail",
           "Emits specialist topology subagent dispatch for agent behavioral tests",
           "Respects the tier: smoke only runs smoke-tests.json, behavioral skips adversarial, full runs everything"
+        ],
+        "assert_sh": [
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test 2>&1 | grep -q 'Run script acceptance tests'",
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test 2>&1 | grep -q 'Do not proceed'"
         ]
       }
     },
@@ -143,6 +150,9 @@
         "agent_behavior": [
           "test-generate.sh exits with status 0",
           "test-generate.sh reports zero failures"
+        ],
+        "assert_sh": [
+          "bash $SKILLS_ENG_ROOT/tests/test-generate.sh 2>&1 | grep -q 'Results:.*0 failed'"
         ]
       }
     }

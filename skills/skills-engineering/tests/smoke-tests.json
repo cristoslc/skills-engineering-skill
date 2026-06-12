@@ -13,6 +13,11 @@
           "SKILL.md body is under 500 lines",
           "SKILL.md describes the 9-phase TDD lifecycle",
           "generate.sh exists and is executable"
+        ],
+        "assert_sh": [
+          "test -f $SKILL_PATH/SKILL.md",
+          "grep -q 'name: skills-engineering' $SKILL_PATH/SKILL.md",
+          "test -x $SKILL_PATH/scripts/generate.sh"
         ]
       }
     },
@@ -32,6 +37,11 @@
           "eval phase exits 0 and runs script tests first",
           "improve phase exits 0 and references .eval-results.json",
           "refactor phase exits 0 and prohibits behavior changes"
+        ],
+        "assert_sh": [
+          "bash $SKILL_PATH/scripts/generate.sh --phase spec --skill-path /tmp/smk-test 2>&1 | grep -q 'spec.md'",
+          "bash $SKILL_PATH/scripts/generate.sh --phase behavioral --skill-path /tmp/smk-test 2>&1 | grep -q 'behavioral-tests.json'",
+          "bash $SKILL_PATH/scripts/generate.sh --phase eval --skill-path /tmp/smk-test 2>&1 | grep -q 'Run script acceptance tests'"
         ]
       }
     },
@@ -44,6 +54,9 @@
         "agent_behavior": [
           "Script exits with non-zero status",
           "Script lists all 9 valid phases in the error message"
+        ],
+        "assert_sh": [
+          "! bash $SKILL_PATH/scripts/generate.sh --phase invalid --skill-path /tmp/smk-test 2>/dev/null"
         ]
       }
     },
@@ -56,6 +69,9 @@
         "agent_behavior": [
           "test-generate.sh exits with status 0",
           "test-generate.sh reports zero failures"
+        ],
+        "assert_sh": [
+          "bash $SKILL_PATH/tests/test-generate.sh 2>&1 | grep -q '0 failed'"
         ]
       }
     }

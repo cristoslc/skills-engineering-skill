@@ -608,6 +608,75 @@ else
   fail "AC40: skill name" "output=$output"
 fi
 
+# ---- Code-based pre-grading (assert_sh) ----
+
+echo ""
+echo "--- AC41: eval phase mentions assert_sh and code-based pre-grading ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'assert_sh'; then
+  pass "AC41: assert_sh mentioned in eval phase"
+else
+  fail "AC41: assert_sh" "not found in eval output"
+fi
+if echo "$output" | grep -q 'code-based'; then
+  pass "AC41: code-based pre-grading mentioned"
+else
+  fail "AC41: code-based" "not found in eval output"
+fi
+if echo "$output" | grep -q 'Track 0'; then
+  pass "AC41: Track 0 (code-based assertions) present"
+else
+  fail "AC41: Track 0" "not found in eval output"
+fi
+
+echo ""
+echo "--- AC42: eval results include code_based field ---"
+if echo "$output" | grep -q 'code_based'; then
+  pass "AC42: code_based field in results format"
+else
+  fail "AC42: code_based" "not found in eval output"
+fi
+
+# ---- Repeat-N flag ----
+
+echo ""
+echo "--- AC43: --repeat flag is accepted by generate.sh ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat 3 --diff-scope full 2>&1)
+status=$?
+if [[ $status -eq 0 ]]; then
+  pass "AC43: --repeat 3 exits 0"
+else
+  fail "AC43: exit code" "expected 0, got $status"
+fi
+if echo "$output" | grep -q 'pass@k'; then
+  pass "AC43: pass@k metric mentioned"
+else
+  fail "AC43: pass@k" "not found in eval output"
+fi
+if echo "$output" | grep -q 'pass.*k'; then
+  pass "AC43: pass^k metric mentioned"
+else
+  fail "AC43: pass^k" "not found in eval output"
+fi
+
+echo ""
+echo "--- AC44: --repeat with value 1 omits repeat-N section ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat 1 --diff-scope full 2>&1)
+if echo "$output" | grep -q 'Repeat mode active'; then
+  fail "AC44: repeat-N section" "should not appear for --repeat 1"
+else
+  pass "AC44: repeat-N section omitted for --repeat 1"
+fi
+
+echo ""
+echo "--- AC45: --repeat without --repeat flag omits repeat-N section ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'Repeat mode active'; then
+  fail "AC45: repeat-N section" "should not appear without --repeat"
+else
+  pass "AC45: repeat-N section omitted without --repeat"
+fi
+
 # ---- Summary ----
 
 echo ""

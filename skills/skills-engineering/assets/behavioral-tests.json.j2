@@ -7,7 +7,12 @@
        given: preconditions (user input, file state, context)
        when:  the skill activation event
        then.agent_behavior[]: ordered list of expected agent actions/assertions
-#}
+       then.assert_sh[]: optional list of shell assertions to run before LLM grading
+         Each assertion is a shell command that exits 0 on pass, non-zero on fail.
+         Evaluated locally before dispatching to the grader subagent.
+         Supports: test -f (file existence), grep -q (pattern match), and any
+         shell command that produces an exit code.
+ #}
 {
   "skill_name": "{{ skill_name }}",
   "tests": [
@@ -23,7 +28,13 @@
           "{{ behavior }}"{% if not loop.last %},{% endif %}
 
 {% endfor %}
-        ]
+        ]{% if test.then.assert_sh is defined and test.then.assert_sh %},
+        "assert_sh": [
+{% for assertion in test.then.assert_sh %}
+          "{{ assertion }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ]{% endif %}
       }
     }{% if not loop.last %},{% endif %}
 
