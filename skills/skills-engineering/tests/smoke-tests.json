@@ -74,6 +74,62 @@
           "bash $SKILL_PATH/tests/test-generate.sh 2>&1 | grep -q '0 failed'"
         ]
       }
+    },
+    {
+      "id": "smk-005",
+      "name": "assert-sh-field-valid-in-test-templates",
+      "given": "The skills-engineering Jinja2 templates are rendered",
+      "when": "An agent checks the assert_sh field structure",
+      "then": {
+        "agent_behavior": [
+          "behavioral-tests.json.j2 includes assert_sh as an optional array under then",
+          "adversarial-tests.json.j2 includes assert_sh as an optional array under then",
+          "smoke-tests.json.j2 includes assert_sh as an optional array under then",
+          "assert_sh values are shell command strings"
+        ],
+        "assert_sh": [
+          "grep -q 'assert_sh' $SKILL_PATH/assets/behavioral-tests.json.j2",
+          "grep -q 'assert_sh' $SKILL_PATH/assets/adversarial-tests.json.j2",
+          "grep -q 'assert_sh' $SKILL_PATH/assets/smoke-tests.json.j2"
+        ]
+      }
+    },
+    {
+      "id": "smk-006",
+      "name": "suite-meta-json-has-required-fields",
+      "given": "The suite-meta.json template exists",
+      "when": "An agent checks the structure",
+      "then": {
+        "agent_behavior": [
+          "suite-meta.json has type field with value 'capability'",
+          "suite-meta.json has graduated_at field with value null",
+          "suite-meta.json has consecutive_full_passes field with numeric value 0",
+          "suite-meta.json has required_for_graduation field with numeric value 3",
+          "suite-meta.json has last_eval field with value null"
+        ],
+        "assert_sh": [
+          "python3 -c \"import json; d=json.load(open('$SKILL_PATH/assets/suite-meta.json')); assert d['type']=='capability'; assert d['graduated_at'] is None; assert d['consecutive_full_passes']==0; assert d['required_for_graduation']==3; assert d['last_eval'] is None\""
+        ]
+      }
+    },
+    {
+      "id": "smk-007",
+      "name": "repeat-flag-validates-inputs",
+      "given": "generate.sh is called with invalid --repeat values",
+      "when": "Invalid repeat values are passed",
+      "then": {
+        "agent_behavior": [
+          "--repeat abc exits non-zero with error message",
+          "--repeat -1 exits non-zero with error message",
+          "--repeat 0 exits non-zero with error message",
+          "--repeat 1 exits zero with no repeat-N section in output"
+        ],
+        "assert_sh": [
+          "! bash $SKILL_PATH/scripts/generate.sh --phase eval --skill-path /tmp/smk-test --repeat abc 2>/dev/null",
+          "! bash $SKILL_PATH/scripts/generate.sh --phase eval --skill-path /tmp/smk-test --repeat -1 2>/dev/null",
+          "! bash $SKILL_PATH/scripts/generate.sh --phase eval --skill-path /tmp/smk-test --repeat 0 2>/dev/null"
+        ]
+      }
     }
   ]
 }

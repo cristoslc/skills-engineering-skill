@@ -155,6 +155,62 @@
           "bash $SKILLS_ENG_ROOT/tests/test-generate.sh 2>&1 | grep -q 'Results:.*0 failed'"
         ]
       }
+    },
+    {
+      "id": "beh-011",
+      "name": "eval-runs-assert-sh-before-grader",
+      "given": "A skill with behavioral tests containing assert_sh clauses is being evaluated",
+      "when": "The skills-engineering skill runs the eval phase",
+      "then": {
+        "agent_behavior": [
+          "Runs assert_sh commands as local shell assertions before dispatching to grader subagents",
+          "Marks tests with failed assert_sh as code_based.passed=false",
+          "Skips LLM grader dispatch for tests where code_based.passed is false",
+          "Proceeds to LLM grader for tests where all assert_sh pass or no assert_sh exists"
+        ],
+        "assert_sh": [
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test --diff-scope full 2>&1 | grep -q 'assert_sh'",
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test --diff-scope full 2>&1 | grep -qi 'skip.*grader\\|skip.*LLM\\|skip.*subagent'"
+        ]
+      }
+    },
+    {
+      "id": "beh-012",
+      "name": "eval-repeat-n-computes-pass-metrics",
+      "given": "A skill is being evaluated with --repeat 3",
+      "when": "The skills-engineering skill runs the eval phase with repeat mode",
+      "then": {
+        "agent_behavior": [
+          "Runs N independent trials with clean context each time",
+          "Computes pass@k: whether the test passes in at least one of N trials",
+          "Computes pass^k: whether the test passes in all N trials",
+          "Reports both metrics in the eval results",
+          "Distinguishes between consistent failures (low pass^k) and flaky failures (high pass@k but low pass^k)"
+        ],
+        "assert_sh": [
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test --repeat 3 --diff-scope full 2>&1 | grep -q 'pass@k'",
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test --repeat 3 --diff-scope full 2>&1 | grep -q 'pass.*k'"
+        ]
+      }
+    },
+    {
+      "id": "beh-013",
+      "name": "eval-checks-suite-meta-on-pass",
+      "given": "A skill with suite-meta.json where consecutive_full_passes is 2 (one away from graduation)",
+      "when": "The skills-engineering skill completes eval with all tests passing",
+      "then": {
+        "agent_behavior": [
+          "Reads suite-meta.json after grading",
+          "Increments consecutive_full_passes when all tests pass",
+          "If consecutive_full_passes >= required_for_graduation, sets type to regression and graduated_at to current timestamp",
+          "If consecutive_full_passes < required_for_graduation, reports progress toward graduation",
+          "Suggests returning to adversary phase if the suite has graduated"
+        ],
+        "assert_sh": [
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test --diff-scope full 2>&1 | grep -q 'suite-meta.json'",
+          "bash $SKILLS_ENG_ROOT/scripts/generate.sh --phase eval --skill-path /tmp/assert-test --diff-scope full 2>&1 | grep -q 'consecutive_full_passes\\|graduated_at\\|regression'"
+        ]
+      }
     }
   ]
 }
