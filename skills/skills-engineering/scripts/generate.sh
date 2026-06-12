@@ -12,6 +12,7 @@ while [[ $# -gt 0 ]]; do
     --skill-path)  SKILL_PATH="$2"; shift 2 ;;
     --diff-scope)  DIFF_SCOPE="$2"; shift 2 ;;
     --repeat)      REPEAT="$2"; shift 2 ;;
+    --tier)        DIFF_SCOPE="$2"; shift 2 ;;
     *) shift ;;
   esac
 done
@@ -624,7 +625,13 @@ Save to $SKILL_PATH/.eval-results.json:
 
 ### Next phase
 
-If all tests passed: the skill is ready. Optionally run the refactor phase.
+If all tests passed:
+1. Check $SKILL_PATH/tests/suite-meta.json for suite lifecycle state.
+2. If `type` is `"capability"` and all tests passed: increment `consecutive_full_passes`.
+3. If `consecutive_full_passes` >= `required_for_graduation`: set `type` to `"regression"`,
+   set `graduated_at` to the current timestamp, and suggest returning to the adversary phase
+   to create harder tests.
+4. Optionally run the refactor phase.
 
 If any tests failed: run:
 \`\`\`

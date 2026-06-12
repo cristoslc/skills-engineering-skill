@@ -248,3 +248,45 @@ the goal is speed, not depth.
 After grading all tests, the generate.sh script automatically detects the diff scope
 and selects the tier. The LLM doesn't decide the tier — it just runs what it's given.
 If the user wants to override the tier, they pass `--diff-scope` explicitly.
+
+## Suite lifecycle: capability to regression
+
+When a test suite passes at 100% (pass^k = 1.0 across all trials if `--repeat` was used),
+the suite can graduate from **capability eval** to **regression eval**.
+
+### suite-meta.json
+
+Each skill's `tests/` directory may contain a `suite-meta.json` that tracks suite state:
+
+```json
+{
+  "type": "capability",
+  "graduated_at": null,
+  "consecutive_full_passes": 0,
+  "required_for_graduation": 3,
+  "last_eval": null
+}
+```
+
+- `type`: `"capability"` (in development, optimizing pass@k) or `"regression"` (shipped, enforcing pass^k)
+- `consecutive_full_passes`: number of consecutive eval runs where all tests passed at 100%
+- `required_for_graduation`: threshold for auto-graduation (default 3)
+- `last_eval`: ISO-8601 timestamp of last eval
+
+### Graduation rules
+
+1. After each full eval, if all tests pass at 100%:
+   - Increment `consecutive_full_passes`
+   - Update `last_eval`
+2. If `consecutive_full_passes >= required_for_graduation`:
+   - Set `type` to `"regression"`
+   - Set `graduated_at` to the current timestamp
+   - Suggest creating new adversarial tests (return to adversary phase)
+3. If any test fails:
+   - Reset `consecutive_full_passes` to 0
+4. A regression suite failure should block all changes (CI red)
+
+### Running regression suites
+
+Use `--tier regression` to run only regression-tier tests as a fast CI gate.
+This skips capability-tier tests that are still in development.
