@@ -3,9 +3,11 @@
 ## Reading eval results
 
 Start by loading `.eval-results.json`. Identify:
-- **Failures**: which tests failed, which clauses, what evidence
+- **Code-based failures**: tests that failed `assert_sh` before reaching the LLM grader. These are deterministic — fix the underlying issue, don't re-run.
+- **LLM-graded failures**: which tests failed Track A, which clauses, what evidence
 - **Qualitative patterns**: what the skill consistently does well vs. poorly across Track B comparisons
 - **Trends**: are failures clustered around a theme (description quality, boundary enforcement, routing)?
+- **Repeat-N metrics** (if `--repeat` was used): tests with low pass^k (consistent failures) should be prioritized over tests with high pass@k but low pass^k (flaky failures)
 
 ## Improvement principles
 

@@ -608,6 +608,130 @@ else
   fail "AC40: skill name" "output=$output"
 fi
 
+# ---- Code-based pre-grading (assert_sh) ----
+
+echo ""
+echo "--- AC41: eval phase mentions assert_sh and code-based pre-grading ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'assert_sh'; then
+  pass "AC41: assert_sh mentioned in eval phase"
+else
+  fail "AC41: assert_sh" "not found in eval output"
+fi
+if echo "$output" | grep -q 'code-based'; then
+  pass "AC41: code-based pre-grading mentioned"
+else
+  fail "AC41: code-based" "not found in eval output"
+fi
+if echo "$output" | grep -q 'Track 0'; then
+  pass "AC41: Track 0 (code-based assertions) present"
+else
+  fail "AC41: Track 0" "not found in eval output"
+fi
+
+echo ""
+echo "--- AC42: eval results include code_based field ---"
+if echo "$output" | grep -q 'code_based'; then
+  pass "AC42: code_based field in results format"
+else
+  fail "AC42: code_based" "not found in eval output"
+fi
+
+# ---- Repeat-N flag ----
+
+echo ""
+echo "--- AC43: --repeat flag is accepted by generate.sh ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat 3 --diff-scope full 2>&1)
+status=$?
+if [[ $status -eq 0 ]]; then
+  pass "AC43: --repeat 3 exits 0"
+else
+  fail "AC43: exit code" "expected 0, got $status"
+fi
+if echo "$output" | grep -q 'pass@k'; then
+  pass "AC43: pass@k metric mentioned"
+else
+  fail "AC43: pass@k" "not found in eval output"
+fi
+if echo "$output" | grep -q 'pass.*k'; then
+  pass "AC43: pass^k metric mentioned"
+else
+  fail "AC43: pass^k" "not found in eval output"
+fi
+
+echo ""
+echo "--- AC44: --repeat with value 1 omits repeat-N section ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat 1 --diff-scope full 2>&1)
+if echo "$output" | grep -q 'Repeat mode active'; then
+  fail "AC44: repeat-N section" "should not appear for --repeat 1"
+else
+  pass "AC44: repeat-N section omitted for --repeat 1"
+fi
+
+echo ""
+echo "--- AC45: --repeat without --repeat flag omits repeat-N section ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'Repeat mode active'; then
+  fail "AC45: repeat-N section" "should not appear without --repeat"
+else
+  pass "AC45: repeat-N section omitted without --repeat"
+fi
+
+# ---- Failure-path tests (mandatory per test suite standards) ----
+
+echo ""
+echo "--- AC46: --repeat 0 is rejected or normalized ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat 0 --diff-scope full 2>&1)
+status=$?
+if echo "$output" | grep -q 'Repeat mode active'; then
+  fail "AC46: --repeat 0" "should not show repeat section for 0"
+else
+  pass "AC46: --repeat 0 does not show repeat-N section"
+fi
+
+echo ""
+echo "--- AC47: --repeat with non-numeric value is rejected ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat abc --diff-scope full 2>&1)
+status=$?
+if [[ $status -ne 0 ]]; then
+  pass "AC47: --repeat abc exits non-zero"
+else
+  fail "AC47: --repeat abc" "expected non-zero exit, got $status"
+fi
+
+echo ""
+echo "--- AC48: --repeat negative is rejected ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --repeat -1 --diff-scope full 2>&1)
+status=$?
+if [[ $status -ne 0 ]]; then
+  pass "AC48: --repeat -1 exits non-zero"
+else
+  fail "AC48: --repeat -1" "expected non-zero exit, got $status"
+fi
+
+echo ""
+echo "--- AC49: assert_sh failure instruction present in eval phase ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'skip.*grader\|skip.*LLM\|skip.*subagent'; then
+  pass "AC49: eval phase instructs skipping LLM grader on assert_sh failure"
+else
+  fail "AC49: assert_sh failure skip" "no instruction to skip grader on assertion failure"
+fi
+
+echo ""
+echo "--- AC50: suite-meta.json graduation instruction present in eval phase ---"
+output=$(bash "$GENERATE_SCRIPT" --phase eval --skill-path /tmp/fake --diff-scope full 2>&1)
+if echo "$output" | grep -q 'suite-meta.json'; then
+  pass "AC50: suite-meta.json referenced in eval phase"
+else
+  fail "AC50: suite-meta.json" "not found in eval output"
+fi
+if echo "$output" | grep -q 'consecutive_full_passes\|graduated_at\|regression'; then
+  pass "AC50: graduation logic referenced in eval phase"
+else
+  fail "AC50: graduation logic" "not found in eval output"
+fi
+
 # ---- Summary ----
 
 echo ""

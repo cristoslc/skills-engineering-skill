@@ -74,6 +74,7 @@ The phase router detects change scope and selects the appropriate test level:
 ## Key design principles
 
 - **Every script gets TDD.** Write acceptance tests first (script-test phase), then implement AC-by-AC (script phase). Scripts are code — same discipline as `.py` or `.sh`.
+- **Code-based pre-grading catches deterministic failures.** Test JSON supports `assert_sh` — shell assertions that run before LLM grader dispatch. If any assertion fails, the test fails immediately without a subagent call.
 - **Adversarial tests come after the skill exists.** You can't write effective boundary attacks against a skill you haven't read. The adversary phase studies the concrete skill and crafts targeted attacks.
 - **The context window is the API.** Phase isolation protects context. Authoring never sees eval criteria. Eval never sees authoring instructions.
 - **Skills are code.** Skill files are markdown syntax. Non-trivial edits require worktree isolation.

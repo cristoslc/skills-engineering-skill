@@ -7,7 +7,8 @@
        given: preconditions (skill is loaded, script is called, etc.)
        when:  the validation trigger
        then.agent_behavior[]: ordered list of expected assertions
-#}
+       then.assert_sh[]: optional list of shell assertions (same format as behavioral tests)
+ #}
 {
   "skill_name": "{{ skill_name }}",
   "tests": [
@@ -23,7 +24,13 @@
           "{{ behavior }}"{% if not loop.last %},{% endif %}
 
 {% endfor %}
-        ]
+        ]{% if test.then.assert_sh is defined and test.then.assert_sh %},
+        "assert_sh": [
+{% for assertion in test.then.assert_sh %}
+          "{{ assertion }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ]{% endif %}
       }
     }{% if not loop.last %},{% endif %}
 
