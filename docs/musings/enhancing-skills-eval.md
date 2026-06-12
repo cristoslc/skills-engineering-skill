@@ -6,7 +6,7 @@ leaving signal on the floor. Here's what a v2 eval system could borrow.
 
 ## 1. Multi-modal grading (three layers, not one)
 
-Today every test is graded by an LLM subagent. That is Anthropic's "model-based" grader — flexible,
+{--Today every test is graded by an LLM subagent.--}{++Not entirely accurate. Script acceptance tests (test-*.sh) are already code-based, deterministic bash — no subagent involved. The claim is true for behavioral/adversarial tests only.++} That is Anthropic's "model-based" grader — flexible,
 but non-deterministic and expensive. Add two more layers:
 
 | Layer | Mechanism | What it catches |
@@ -17,12 +17,12 @@ but non-deterministic and expensive. Add two more layers:
 
 Code-based graders don't need a subagent — they run as shell assertions after the trial. A test
 could assert "file X must exist", "tool Y was called with param Z", or "JSON output matches schema".
-Fast, cheap, objective. This already exists as the `assert` key in test JSON but is only used by
-the grader subagent, not as a first-pass filter.
+Fast, cheap, objective. {--This already exists as the `assert` key in test JSON but is only used by
+the grader subagent, not as a first-pass filter.--}{++Partially true. The test JSON format uses `then.agent_behavior` (behavioral) and `must_not`/`must` (adversarial) as structured assertion clauses — not a separate `assert` key. These are currently passed to the grader subagent as rubric input, never evaluated locally. The insight is right (local pre-filter before LLM grading), but the mechanism should extend the existing `then`/`must_not`/`must` structure, not add a new `assert` key.++}
 
 ## 2. Statistical evaluation for non-determinism
 
-The current system runs each test once. If it fails, the improve phase tries to fix it. But
+The current system runs each test once. If it fails, the improve phase tries to fix it.{++ This is accurate — there is no `--repeat` flag in generate.sh.++} But
 Anthropic's research shows: agent behavior varies between runs. A single failure could be bad
 luck, not a real regression.
 
@@ -41,13 +41,15 @@ should enforce pass^k.
 Anthropic's roadmap: "20-50 simple tasks drawn from real failures is a great start."
 
 The current spec phase writes behavioral contracts before the skill exists. This is good. But:
-- Tasks come from imagination, not production failures
-- No reference solutions are collected alongside tasks
-- Positive/negative balance isn't tracked
+- Tasks come from imagination, not production failures {++— fair point, though the adversary phase (phase 6) does generate negative cases from the skill's actual boundaries. The gap is in the spec phase, not the lifecycle.++}
+- No reference solutions are collected alongside tasks {++— the `then.agent_behavior` clauses *are* the reference solutions for behavioral tests. They define exactly what "pass" looks like. The gap is for adversarial tests, where reference solutions are implicit (refuse/ignore).++}
+- Positive/negative balance isn't tracked {++— partially addressed. The adversary phase generates `must_not` tests after the skill exists. A spec-phase `negative_cases` section would duplicate this. The real gap is that adversarial tests come *after* skill authoring, not *alongside* behavioral tests.++}
 
 Add to spec.md:
 - A `negative_cases` section: "what should the agent NOT do" — balanced against positive cases
+{++— Risk: duplicating the adversary phase's purpose. Better to strengthen the adversary phase or add a "negative spec" checklist that feeds into it, rather than embedding adversarial concerns in spec.md.++}
 - Reference solutions for each task before coding starts
+{++— Behavioral `then` clauses already serve this purpose. For adversarial tests, the reference solution is "agent refuses/stays in boundary" — hard to write before the skill exists.++}
 - Source tasks from real agent failures in consumer projects, not hypotheticals
 
 ## 4. Gradation: from capability to regression
@@ -63,11 +65,13 @@ This should be automatic:
 Currently, there's no distinction. A 100% pass rate means "done" — but it should mean "moved to
 regression, new harder tests needed."
 
+{++Accurate — the eval reference doc says "stop when all tests pass" with no lifecycle beyond that. This is a real gap.++}
+
 ## 5. Transcript review as a structured activity
 
 Anthropic: "You won't know if your graders are working unless you read the transcripts."
 
-The current system discards trial transcripts after grading. Capture them in `.eval-traces/` with:
+{--The current system discards trial transcripts after grading.--}{++Not exactly. The grader subagent receives the full agent output and produces structured evidence per clause. What's missing is persistent storage of the raw transcript for post-hoc pattern analysis, not the grading itself.++} Capture them in `.eval-traces/` with:
 - Full agent output per test
 - Tool calls and decisions
 - Grader reasoning (not just pass/fail)
@@ -91,6 +95,8 @@ The skills-engineering skill doesn't own the consumer's production infra — but
 a trace format that consumers can import. An `export-eval-trace` script that dumps trial data
 in a standard JSONL format would open this path.
 
+{++Scope concern: this conflates offline skill eval with production observability. Better to start by enriching `.eval-results.json` with the data the grader already produces (clause-level evidence, per-test timing), then let consumers decide how to ingest it. The Arize/LangSmith/promptfoo integration framing is premature.++}
+
 ## 7. LLM-as-judge calibration and drift
 
 The current system uses one subagent to grade another. This is fine initially, but:
@@ -103,6 +109,8 @@ Add a calibration step: periodically run a small set of tasks with known answers
 solutions), check if the grader's scores match the known labels. If deviation exceeds a
 threshold, flag the grader for recalibration.
 
+{++Premature. The current grader uses a deterministic rubric — every clause must pass for overall pass. Calibration matters most for subjective grading scales (1-5 scores), not binary pass/fail with evidence. This becomes relevant when grading moves to softer rubrics, but right now the rubric design minimizes subjectivity by design. Defer until the base eval system has code-based pre-filtering and repeat-N.++}
+
 ## 8. Concrete build-out: translating trove knowledge into skill eval features
 
 The agent-testing-frameworks trove catalogs what the ecosystem does. Here is a concrete
@@ -110,9 +118,11 @@ sequence of features to build into the skills-engineering skill, prioritized by 
 
 ### Phase A: Code-based pre-grading (least effort, highest leverage)
 
+{++Confirmed — highest leverage change. The eval phase already runs deterministic script tests first (a gate), then dispatches to subagents for behavioral/adversarial. The gap is: no local assertion pass between "script tests pass" and "dispatch to grader." This would extend the existing gate pattern to cover structural checks on behavioral/adversarial assertions before paying for an LLM grader.++}
+
 Before dispatching each trial to a grader subagent, run a shell-level assertion pass.
-The test JSON already has an `assert` key — but today it's passed to the grader subagent
-as part of the grading prompt. Instead, evaluate it locally first:
+{--The test JSON already has an `assert` key — but today it's passed to the grader subagent
+as part of the grading prompt. Instead, evaluate it locally first:--}{++The test JSON uses `then.agent_behavior`, `must_not`, and `must` as assertion clauses — there is no separate `assert` key. These are currently rubric input for the grader. The change: extract checkable assertions (file existence, pattern presence, tool call verification) and evaluate them as shell assertions before dispatching to the LLM grader.++}
 
 ```
 trial output → shell assertions (code-based) → if all pass → LLM grader for semantic quality
@@ -150,6 +160,8 @@ Add automated checks when the spec phase writes test cases:
   verdict, flag the task as ambiguous (Anthropic: "a good task is one where two
   domain experts would independently reach the same verdict")
 
+{++Redundancy risk: the adversary phase already generates negative cases (`must_not`) after the skill exists. Adding a 30% negative requirement to the spec phase duplicates this. The ambiguity detector doubles grading cost (two subagents per test). The reference solution validator is reasonable for adversarial tests but behavioral `then` clauses already define pass criteria. Defer — the adversary phase covers the negative-case gap if strengthened.++}
+
 ### Phase D: Capability-to-regression automatic pipeline
 
 After eval, if all tests pass at pass^k=1.0 across `--repeat 3`, automatically:
@@ -160,6 +172,8 @@ After eval, if all tests pass at pass^k=1.0 across `--repeat 3`, automatically:
 
 This implements Anthropic's "graduate to regression" pattern and ensures the skill
 keeps getting challenged rather than saturating.
+
+{++Good direction. Requires: (1) a suite metadata format with a `type: capability|regression` tag, (2) a graduation heuristic in the eval phase, (3) a `--tier regression` mode in generate.sh. Design after Phase A and B are implemented.++}
 
 ### Phase E: Trace export for consumer integration
 
@@ -176,17 +190,25 @@ Consumer projects can then:
 This is the bridge between offline skill evals and the consumer's production observability
 stack — and it's the piece that makes the eval loop self-sustaining over time.
 
+{++Over-scoped. Start by enriching `.eval-results.json` with clause-level evidence and per-test timing — data the grader already produces but doesn't persist. The Arize/LangSmith/promptfoo integration framing is consumer-side scope creep. The skill should emit rich results; consumers decide how to ingest.++}
+
 ## Summary
 
 | Capability | Current | V2 target |
 |---|---|---|
 | Grading layers | Model-based only | Code-based + Model-based + Statistical |
+
+{++Correction: the current system has two grading layers already — deterministic script tests (bash, no subagent) and model-based behavioral/adversarial grading. What's missing is code-based pre-filtering *between* these two: local shell assertions on behavioral/adversarial test output before paying for an LLM grader.++}
 | Non-determinism | Untracked | pass@k + pass^k across N trials |
 | Task sourcing | Speculative | Real failures + balanced positive/negative |
 | Suite lifecycle | Flat | Capability → Regression pipeline |
 | Transcripts | Discarded | Saved, analyzed for patterns |
+
+{++Correction: not discarded — the grader subagent processes them and produces structured evidence. What's missing is persistent storage of raw transcripts for post-hoc pattern analysis.++}
 | Production feedback | None | Trace import format |
 | Judge calibration | None | Periodic reference-check |
+
+{++Premature — current rubric is binary pass/fail with evidence, minimizing subjectivity.++}
 
 None of this requires a new tool — promptfoo, LangSmith, and Arize already implement pieces of
 this. The question is which pieces to embed in the skills-engineering workflow vs. which to
