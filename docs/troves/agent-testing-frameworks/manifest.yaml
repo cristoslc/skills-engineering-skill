@@ -1,0 +1,71 @@
+trove_id: agent-testing-frameworks
+created: 2026-06-12
+tags:
+  - agent-testing
+  - promptfoo
+  - probabilistic-testing
+  - llm-evaluation
+  - eval-frameworks
+  - anthropic-evals
+  - langsmith
+  - weights-and-biases
+  - arize-phoenix
+  - agent-evals
+freshness_ttl:
+  web: 180
+  media: 365
+  local: 365
+sources:
+  - id: promptfoo
+    title: "Promptfoo - Intro and Evaluate Coding Agents"
+    url: "https://www.promptfoo.dev/docs/intro/"
+    type: web
+    fetch_date: 2026-06-12
+    content_hash: "65bbaceff8290d2506f211cbd1d0ecc29880eda610f70504f5e66605070c299d"
+    description: "Promptfoo's philosophy, workflow, and agent evaluation guide covering capability tiers, non-determinism, and evaluation principles."
+
+  - id: anthropic-demystifying-evals
+    title: "Anthropic - Demystifying Evals for AI Agents"
+    url: "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents"
+    type: web
+    fetch_date: 2026-06-12
+    content_hash: "a6fd1bad12b994f738ceb4dc95b8c1dbe2345ddf5b3c37f7b9fa8158957f5511"
+    description: "Anthropic's comprehensive guide to agent evaluation methodology including grader types, pass@k metrics, eval suite design, and maintenance."
+
+  - id: anthropic-statistical-evals
+    title: "Anthropic - A Statistical Approach to Model Evaluations"
+    url: "https://www.anthropic.com/research/statistical-approach-to-model-evals"
+    type: web
+    fetch_date: 2026-06-12
+    content_hash: "eae046849a130d64c203203f29cda6ea404f7fa510961c87825fa2751022626b"
+    description: "Anthropic's research paper on statistical methods for evals - CLT, clustered standard errors, paired-difference analysis, power analysis."
+
+  - id: langsmith-evaluation
+    title: "LangSmith - LLM & AI Agent Evals Platform"
+    url: "https://www.langchain.com/langsmith/evaluation"
+    type: web
+    fetch_date: 2026-06-12
+    content_hash: "a99f96fd70d559321254405c932304a41448b4bca24b677dd9b46e9637491094"
+    description: "LangSmith's evaluation platform for LLM agents - offline/online evals, LLM-as-judge, trajectory evaluation, dataset management."
+
+  - id: weights-biases-prompts
+    title: "Weights & Biases - LLM Evaluation: Metrics, Frameworks, and Best Practices"
+    url: "https://wandb.ai/onlineinference/genai-research/reports/LLM-evaluation-Metrics-frameworks-and-best-practices--VmlldzoxMTMxNjQ4NA"
+    type: web
+    fetch_date: 2026-06-12
+    content_hash: "82d97b6b71ed1263a27fc935879090aef736b898ee999971a61503595e6da31d"
+    description: "W&B's comprehensive guide to LLM evaluation including W&B Weave, evaluation-driven development, Wandbot case study, and LLM-as-a-judge."
+
+  history:
+  - event: created
+    date: 2026-06-12
+    commit: "--"
+    sources: 6
+
+  - id: arize-phoenix
+    title: "Arize AI - Agent Observability, Evaluation & Improvement Platform"
+    url: "https://arize.com/"
+    type: web
+    fetch_date: 2026-06-12
+    content_hash: "8d6c1fd7a85b447a87ee3cffe1edd8bf01b4b2d2e8d33dc3ac038e9167a66f32"
+    description: "Arize's Phoenix open-source platform for AI observability and evaluation - tracing, span/session evals, datasets, experiments."
